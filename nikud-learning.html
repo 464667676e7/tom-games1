@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>משחק לימוד ניקוד</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 20px;
+        }
+
+        #gameContainer {
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        #score {
+            font-size: 36px;
+            color: #2196F3;
+            margin: 20px 0;
+        }
+
+        #question {
+            font-size: 32px;
+            margin: 20px 0;
+            color: #333;
+        }
+
+        #options {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 30px 0;
+        }
+
+        .option {
+            width: 200px;
+            height: 200px;
+            cursor: pointer;
+            transition: transform 0.3s;
+            border: 4px solid transparent;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 72px;
+            background-color: #f5f5f5;
+        }
+
+        .option:hover {
+            transform: scale(1.1);
+            border-color: #2196F3;
+        }
+
+        #message {
+            font-size: 24px;
+            margin: 20px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .correct {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .wrong {
+            background-color: #f44336;
+            color: white;
+        }
+
+        #winScreen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #winMessage {
+            background-color: #4CAF50;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            color: white;
+            font-size: 36px;
+        }
+
+        #playAgain {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 24px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="score">ניקוד: 0</div>
+        <div id="question">בחר את הניקוד: קָמָץ</div>
+        <div id="options">
+            <div class="option" data-nikud="קמץ">אָ</div>
+            <div class="option" data-nikud="פתח">אַ</div>
+        </div>
+        <div id="message"></div>
+    </div>
+
+    <div id="winScreen">
+        <div id="winMessage">
+            כל הכבוד! 🎉
+            <br>
+            הגעת ל-500 נקודות!
+            <br>
+            <button id="playAgain">שחק שוב</button>
+        </div>
+    </div>
+
+    <audio id="correctSound" src="https://www.soundjay.com/buttons/sounds/button-09.mp3"></audio>
+    <audio id="wrongSound" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
+
+    <script>
+        const scoreElement = document.getElementById('score');
+        const questionElement = document.getElementById('question');
+        const messageElement = document.getElementById('message');
+        const winScreen = document.getElementById('winScreen');
+        const correctSound = document.getElementById('correctSound');
+        const wrongSound = document.getElementById('wrongSound');
+        
+        let score = 0;
+        let currentNikud = '';
+
+        function setNewQuestion() {
+            currentNikud = Math.random() < 0.5 ? 'קמץ' : 'פתח';
+            questionElement.textContent = `בחר את הניקוד: ${currentNikud}`;
+        }
+
+        function showMessage(isCorrect) {
+            messageElement.textContent = isCorrect ? 'כל הכבוד! 🎉' : 'טעות... 😕';
+            messageElement.className = isCorrect ? 'correct' : 'wrong';
+            messageElement.style.display = 'block';
+            
+            setTimeout(() => {
+                messageElement.style.display = 'none';
+            }, 1500);
+        }
+
+        function checkWin() {
+            if (score >= 500) {
+                winScreen.style.display = 'flex';
+            }
+        }
+
+        function resetGame() {
+            score = 0;
+            scoreElement.textContent = `ניקוד: ${score}`;
+            winScreen.style.display = 'none';
+            setNewQuestion();
+        }
+
+        document.querySelectorAll('.option').forEach(option => {
+            option.addEventListener('click', () => {
+                const selectedNikud = option.dataset.nikud;
+                const isCorrect = selectedNikud === currentNikud;
+                
+                if (isCorrect) {
+                    score += 10;
+                    correctSound.play();
+                } else {
+                    score = Math.max(0, score - 10);
+                    wrongSound.play();
+                }
+                
+                showMessage(isCorrect);
+                scoreElement.textContent = `ניקוד: ${score}`;
+                checkWin();
+                
+                setTimeout(setNewQuestion, 1500);
+            });
+        });
+
+        document.getElementById('playAgain').addEventListener('click', resetGame);
+        
+        setNewQuestion();
+    </script>
+</body>
+</html>

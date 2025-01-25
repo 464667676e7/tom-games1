@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>משחק תופסת</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        
+        #gameCanvas {
+            border: 2px solid black;
+            background: white;
+            margin: 20px;
+        }
+        
+        #score {
+            font-size: 24px;
+            margin: 10px;
+            color: #2196F3;
+        }
+    </style>
+</head>
+<body>
+    <div id="score">ניקוד: 0</div>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreElement = document.getElementById('score');
+        
+        let score = 0;
+        let target = {
+            x: 200,
+            y: 200,
+            radius: 20,
+            speed: 3,
+            dx: 3,
+            dy: 3
+        };
+
+        function drawTarget() {
+            ctx.beginPath();
+            ctx.arc(target.x, target.y, target.radius, 0, Math.PI * 2);
+            ctx.fillStyle = '#ff4444';
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        function moveTarget() {
+            target.x += target.dx;
+            target.y += target.dy;
+
+            if (target.x + target.radius > canvas.width || target.x - target.radius < 0) {
+                target.dx = -target.dx;
+            }
+            if (target.y + target.radius > canvas.height || target.y - target.radius < 0) {
+                target.dy = -target.dy;
+            }
+        }
+
+        function checkClick(event) {
+            const rect = canvas.getBoundingClientRect();
+            const clickX = event.clientX - rect.left;
+            const clickY = event.clientY - rect.top;
+            
+            const distance = Math.sqrt(
+                Math.pow(clickX - target.x, 2) + 
+                Math.pow(clickY - target.y, 2)
+            );
+            
+            if (distance < target.radius) {
+                score += 10;
+                scoreElement.textContent = `ניקוד: ${score}`;
+                target.speed += 0.5;
+                target.dx = target.dx > 0 ? target.speed : -target.speed;
+                target.dy = target.dy > 0 ? target.speed : -target.speed;
+                
+                target.x = Math.random() * (canvas.width - target.radius * 2) + target.radius;
+                target.y = Math.random() * (canvas.height - target.radius * 2) + target.radius;
+            }
+        }
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            moveTarget();
+            drawTarget();
+            requestAnimationFrame(gameLoop);
+        }
+
+        canvas.addEventListener('click', checkClick);
+        gameLoop();
+    </script>
+</body>
+</html>

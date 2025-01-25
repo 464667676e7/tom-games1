@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>משחק יום הולדת</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        
+        #gameCanvas {
+            border: 2px solid #ff69b4;
+            background: #fff8f8;
+            margin: 20px;
+        }
+        
+        #score {
+            font-size: 24px;
+            margin: 10px;
+            color: #ff69b4;
+        }
+
+        #gameOver {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        }
+
+        #restartButton {
+            padding: 10px 20px;
+            background-color: #ff69b4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        #restartButton:hover {
+            background-color: #ff1493;
+        }
+    </style>
+</head>
+<body>
+    <div id="score">ניקוד: 0</div>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <div id="gameOver">
+        <h2>🎉 המשחק נגמר! 🎉</h2>
+        <p>הניקוד הסופי שלך: <span id="finalScore">0</span></p>
+        <button id="restartButton">שחק שוב</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreElement = document.getElementById('score');
+        const gameOverElement = document.getElementById('gameOver');
+        const finalScoreElement = document.getElementById('finalScore');
+        const restartButton = document.getElementById('restartButton');
+
+        let player = {
+            x: canvas.width / 2,
+            y: canvas.height - 30,
+            width: 50,
+            height: 50,
+            speed: 5
+        };
+
+        let items = [];
+        let score = 0;
+        let gameRunning = true;
+        let keys = {};
+
+        class Item {
+            constructor() {
+                this.reset();
+                this.y = 0;
+                this.type = Math.random() < 0.7 ? 'balloon' : 'cake';
+            }
+
+            reset() {
+                this.width = 30;
+                this.height = 30;
+                this.x = Math.random() * (canvas.width - this.width);
+                this.y = -this.height;
+                this.speed = 2 + Math.random() * 2;
+            }
+
+            draw() {
+                ctx.fillStyle = this.type === 'balloon' ? '#ff69b4' : '#ffd700';
+                if (this.type === 'balloon') {
+                    // ציור בלון
+                    ctx.beginPath();
+                    ctx.arc(this.x + this.width/2, this.y + this.width/2, this.width/2, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.moveTo(this.x + this.width/2, this.y + this.width);
+                    ctx.lineTo(this.x + this.width/2, this.y + this.width + 10);
+                    ctx.strokeStyle = '#ff69b4';
+                    ctx.stroke();
+                } else {
+                    // ציור עוגה
+                    ctx.fillRect(this.x, this.y, this.width, this.height);
+                    ctx.fillStyle = '#ff1493';
+                    ctx.beginPath();
+                    ctx.arc(this.x + this.width/2, this.y, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            update() {
+                this.y += this.speed;
+                if (this.y > canvas.height) {
+                    if (this.type === 'cake') {
+                        gameOver();
+                    }
+                    return false;
+                }
+                return true;
+            }
+        }
+
+        function drawPlayer() {
+            ctx.fillStyle = '#4CAF50';
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+        }
+
+        function update() {
+            if (!gameRunning) return;
+
+            if (keys.ArrowLeft && player.x > 0) {
+                player.x -= player.speed;
+            }
+            if (keys.ArrowRight && player.x < canvas.width - player.width) {
+                player.x += player.speed;
+            }
+
+            // הוספת פריטים חדשים
+            if (Math.random() < 0.02) {
+                items.push(new Item());
+            }
+
+            // עדכון פריטים
+            items = items.filter(item => {
+                const alive = item.update();
+                
+                // בדיקת התנגשות
+                if (player.x < item.x + item.width &&
+                    player.x + player.width > item.x &&
+                    player.y < item.y + item.height &&
+                    player.y + player.height > item.y) {
+                    score += item.type === 'balloon' ? 1 : 5;
+                    scoreElement.textContent = `ניקוד: ${score}`;
+                    return false;
+                }
+                
+                return alive;
+            });
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            items.forEach(item => item.draw());
+            drawPlayer();
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            if (gameRunning) {
+                requestAnimationFrame(gameLoop);
+            }
+        }
+
+        function gameOver() {
+            gameRunning = false;
+            finalScoreElement.textContent = score;
+            gameOverElement.style.display = 'block';
+        }
+
+        function restartGame() {
+            items = [];
+            score = 0;
+            player.x = canvas.width / 2;
+            scoreElement.textContent = `ניקוד: ${score}`;
+            gameOverElement.style.display = 'none';
+            gameRunning = true;
+            gameLoop();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+        });
+
+        document.addEventListener('keyup', (e) => {
+            keys[e.key] = false;
+        });
+
+        restartButton.addEventListener('click', restartGame);
+        gameLoop();
+    </script>
+</body>
+</html>

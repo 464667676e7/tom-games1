@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="he">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>משחקים של טום</title>
+
+    <style>
+
+        body {
+
+            font-family: 'Segoe UI', Arial, sans-serif;
+
+            background-color: #f0f0f0;
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+            padding: 20px;
+
+        }
+
+
+
+        h1 {
+
+            color: #2196F3;
+
+            text-align: center;
+
+            margin-bottom: 30px;
+
+        }
+
+
+
+        .games-container {
+
+            display: grid;
+
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+
+            gap: 20px;
+
+            max-width: 1200px;
+
+            width: 100%;
+
+        }
+
+
+
+        .game-card {
+
+            background: white;
+
+            border-radius: 10px;
+
+            padding: 20px;
+
+            text-align: center;
+
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+
+            transition: transform 0.3s ease;
+
+        }
+
+
+
+        .game-card:hover {
+
+            transform: translateY(-5px);
+
+        }
+
+
+
+        .game-card img {
+
+            width: 100%;
+
+            max-width: 200px;
+
+            height: auto;
+
+            margin-bottom: 15px;
+
+            border-radius: 5px;
+
+        }
+
+
+
+        .game-card h2 {
+
+            color: #333;
+
+            margin-bottom: 10px;
+
+        }
+
+
+
+        .game-card p {
+
+            color: #666;
+
+            margin-bottom: 15px;
+
+        }
+
+
+
+        .play-button {
+
+            display: inline-block;
+
+            padding: 10px 20px;
+
+            background-color: #2196F3;
+
+            color: white;
+
+            text-decoration: none;
+
+            border-radius: 5px;
+
+            transition: background-color 0.3s ease;
+
+        }
+
+
+
+        .play-button:hover {
+
+            background-color: #1976D2;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <h1>משחקים של טום</h1>
+
+    
+
+    <div class="games-container">
+
+        <div class="game-card">
+
+            <img src="catch-game-preview.png" alt="משחק תופסת" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22150%22><rect width=%22200%22 height=%22150%22 fill=%22%23ddd%22/></svg>'">
+
+            <h2>משחק תופסת</h2>
+
+            <p>נסו לתפוס את העיגול האדום! ככל שתצליחו יותר, כך המשחק יהיה מאתגר יותר.</p>
+
+            <a href="catch-game.html" class="play-button">שחק עכשיו</a>
+
+        </div>
+
+
+
+        <div class="game-card">
+
+            <img src="nikud-preview.png" alt="משחק ניקוד" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22150%22><rect width=%22200%22 height=%22150%22 fill=%22%23ddd%22/></svg>'">
+
+            <h2>לימוד ניקוד</h2>
+
+            <p>תרגלו את הניקוד בעברית באופן אינטראקטיבי ומהנה.</p>
+
+            <a href="nikud-learning.html" class="play-button">שחק עכשיו</a>
+
+        </div>
+
+
+
+        <div class="game-card">
+
+            <img src="snake-game-preview.png" alt="משחק נחש" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22150%22><rect width=%22200%22 height=%22150%22 fill=%22%23ddd%22/></svg>'">
+
+            <h2>משחק נחש</h2>
+
+            <p>משחק נחש קלאסי! אכול את האוכל, גדל וצבור נקודות.</p>
+
+            <a href="snake-game.html" class="play-button">שחק עכשיו</a>
+
+        </div>
+
+
+
+        <div class="game-card">
+
+            <img src="birthday-game-preview.png" alt="משחק יום הולדת" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22150%22><rect width=%22200%22 height=%22150%22 fill=%22%23ddd%22/></svg>'">
+
+            <h2>משחק יום הולדת</h2>
+
+            <p>תפסו בלונים ועוגות! אבל היזהרו - אם תפספסו עוגה, המשחק נגמר!</p>
+
+            <a href="birthday-game.html" class="play-button">שחק עכשיו</a>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html> 
