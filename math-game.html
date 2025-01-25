@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>משחק חשבון</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        #question {
+            font-size: 24px;
+            margin: 20px;
+            color: #2196F3;
+        }
+
+        #answer {
+            font-size: 18px;
+            padding: 10px;
+            width: 100px;
+            margin: 10px;
+            border: 2px solid #2196F3;
+            border-radius: 5px;
+        }
+
+        #submit {
+            padding: 10px 20px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+
+        #submit:hover {
+            background-color: #1976D2;
+        }
+
+        #score {
+            font-size: 20px;
+            margin: 10px;
+            color: #4CAF50;
+        }
+
+        #timer {
+            font-size: 20px;
+            margin: 10px;
+            color: #FF5722;
+        }
+
+        .feedback {
+            font-size: 18px;
+            margin: 10px;
+            min-height: 27px;
+        }
+
+        .correct {
+            color: #4CAF50;
+        }
+
+        .wrong {
+            color: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div id="timer">זמן: 60 שניות</div>
+        <div id="score">ניקוד: 0</div>
+        <div id="question">?</div>
+        <input type="number" id="answer" placeholder="תשובה">
+        <button id="submit">בדוק!</button>
+        <div class="feedback"></div>
+    </div>
+
+    <script>
+        const questionElement = document.getElementById('question');
+        const answerElement = document.getElementById('answer');
+        const submitButton = document.getElementById('submit');
+        const scoreElement = document.getElementById('score');
+        const timerElement = document.getElementById('timer');
+        const feedbackElement = document.querySelector('.feedback');
+
+        let score = 0;
+        let timeLeft = 60;
+        let currentAnswer = 0;
+        let timer;
+
+        function generateQuestion() {
+            const operations = ['+', '-', '*'];
+            const operation = operations[Math.floor(Math.random() * operations.length)];
+            let num1, num2;
+
+            switch(operation) {
+                case '+':
+                    num1 = Math.floor(Math.random() * 20) + 1;
+                    num2 = Math.floor(Math.random() * 20) + 1;
+                    currentAnswer = num1 + num2;
+                    break;
+                case '-':
+                    num1 = Math.floor(Math.random() * 20) + 1;
+                    num2 = Math.floor(Math.random() * num1) + 1;
+                    currentAnswer = num1 - num2;
+                    break;
+                case '*':
+                    num1 = Math.floor(Math.random() * 10) + 1;
+                    num2 = Math.floor(Math.random() * 10) + 1;
+                    currentAnswer = num1 * num2;
+                    break;
+            }
+
+            questionElement.textContent = `${num1} ${operation} ${num2} = ?`;
+            answerElement.value = '';
+            answerElement.focus();
+        }
+
+        function checkAnswer() {
+            const userAnswer = parseInt(answerElement.value);
+            
+            if (userAnswer === currentAnswer) {
+                score += 10;
+                feedbackElement.textContent = 'נכון! כל הכבוד! 🎉';
+                feedbackElement.className = 'feedback correct';
+            } else {
+                feedbackElement.textContent = `לא נכון... התשובה הנכונה היא ${currentAnswer}`;
+                feedbackElement.className = 'feedback wrong';
+            }
+
+            scoreElement.textContent = `ניקוד: ${score}`;
+            generateQuestion();
+        }
+
+        function updateTimer() {
+            timeLeft--;
+            timerElement.textContent = `זמן: ${timeLeft} שניות`;
+
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                questionElement.textContent = 'המשחק נגמר!';
+                answerElement.disabled = true;
+                submitButton.disabled = true;
+                feedbackElement.textContent = `הניקוד הסופי שלך: ${score}`;
+                feedbackElement.className = 'feedback';
+            }
+        }
+
+        submitButton.addEventListener('click', checkAnswer);
+        answerElement.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+
+        generateQuestion();
+        timer = setInterval(updateTimer, 1000);
+    </script>
+</body>
+</html>
