@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>משחק טריוויה</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+
+        #question {
+            font-size: 22px;
+            margin: 20px 0;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .options-container {
+            display: grid;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .option-button {
+            padding: 15px 20px;
+            background-color: #fff;
+            border: 2px solid #2196F3;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .option-button:hover {
+            background-color: #e3f2fd;
+        }
+
+        .option-button.correct {
+            background-color: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+
+        .option-button.wrong {
+            background-color: #f44336;
+            color: white;
+            border-color: #f44336;
+        }
+
+        #score {
+            font-size: 20px;
+            margin: 10px;
+            color: #2196F3;
+        }
+
+        #next-button {
+            padding: 12px 25px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 15px;
+            display: none;
+        }
+
+        #next-button:hover {
+            background-color: #1976D2;
+        }
+
+        #game-over {
+            display: none;
+            text-align: center;
+        }
+
+        #restart-button {
+            padding: 12px 25px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 15px;
+        }
+
+        #restart-button:hover {
+            background-color: #388E3C;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div id="score">ניקוד: 0</div>
+        <div id="question"></div>
+        <div class="options-container" id="options"></div>
+        <button id="next-button">השאלה הבאה</button>
+        <div id="game-over">
+            <h2>המשחק נגמר!</h2>
+            <p>הניקוד הסופי שלך: <span id="final-score">0</span></p>
+            <button id="restart-button">שחק שוב</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "איזה מספר ממשיך את הסדרה: 2, 4, 8, 16, ...?",
+                options: ["24", "32", "30", "28"],
+                correct: 1
+            },
+            {
+                question: "אם בשעה 3:00 המחוגים יוצרים זווית של 90 מעלות, איזו זווית הם יוצרים בשעה 6:00?",
+                options: ["180 מעלות", "150 מעלות", "120 מעלות", "90 מעלות"],
+                correct: 0
+            },
+            {
+                question: "כמה משולשים יש בצורה הבאה: ▲▲▲?",
+                options: ["3", "4", "6", "7"],
+                correct: 2
+            },
+            {
+                question: "השלם את המילה החסרה: עין ל___ כמו אוזן ל___",
+                options: ["ראייה, שמיעה", "משקפיים, אוזניות", "צבע, צליל", "עפעף, תנוך"],
+                correct: 0
+            },
+            {
+                question: "אם היום יום שלישי, מה היה היום לפני אתמול?",
+                options: ["יום ראשון", "יום שני", "יום שבת", "יום שישי"],
+                correct: 0
+            },
+            {
+                question: "איזה מספר משלים את המשוואה: 15 + __ = 10 + 10",
+                options: ["5", "10", "15", "20"],
+                correct: 0
+            },
+            {
+                question: "אם לחתול יש 4 רגליים, כמה רגליים יש ל-3 חתולים?",
+                options: ["8", "10", "12", "14"],
+                correct: 2
+            },
+            {
+                question: "מה יוצא דופן?",
+                options: ["תפוח", "בננה", "גזר", "אגס"],
+                correct: 2
+            },
+            {
+                question: "השלם את הרצף: א, ג, ה, ...",
+                options: ["ו", "ז", "ח", "ט"],
+                correct: 0
+            },
+            {
+                question: "כמה מרובעים יש בציור: ⬜⬜?",
+                options: ["2", "3", "4", "5"],
+                correct: 1
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let canAnswer = true;
+
+        const questionElement = document.getElementById('question');
+        const optionsContainer = document.getElementById('options');
+        const scoreElement = document.getElementById('score');
+        const nextButton = document.getElementById('next-button');
+        const gameOverElement = document.getElementById('game-over');
+        const finalScoreElement = document.getElementById('final-score');
+        const restartButton = document.getElementById('restart-button');
+
+        function showQuestion() {
+            const question = questions[currentQuestion];
+            questionElement.textContent = question.question;
+            optionsContainer.innerHTML = '';
+            canAnswer = true;
+            nextButton.style.display = 'none';
+
+            question.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'option-button';
+                button.textContent = option;
+                button.onclick = () => checkAnswer(index);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function checkAnswer(selectedIndex) {
+            if (!canAnswer) return;
+            canAnswer = false;
+
+            const question = questions[currentQuestion];
+            const buttons = optionsContainer.getElementsByClassName('option-button');
+
+            // מציג את התשובה הנכונה והשגויה
+            buttons[question.correct].classList.add('correct');
+            if (selectedIndex !== question.correct) {
+                buttons[selectedIndex].classList.add('wrong');
+            } else {
+                score += 10;
+                scoreElement.textContent = `ניקוד: ${score}`;
+            }
+
+            nextButton.style.display = 'block';
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                showQuestion();
+            } else {
+                showGameOver();
+            }
+        }
+
+        function showGameOver() {
+            questionElement.style.display = 'none';
+            optionsContainer.style.display = 'none';
+            nextButton.style.display = 'none';
+            gameOverElement.style.display = 'block';
+            finalScoreElement.textContent = score;
+        }
+
+        function restartGame() {
+            currentQuestion = 0;
+            score = 0;
+            scoreElement.textContent = `ניקוד: ${score}`;
+            questionElement.style.display = 'block';
+            optionsContainer.style.display = 'grid';
+            gameOverElement.style.display = 'none';
+            showQuestion();
+        }
+
+        nextButton.addEventListener('click', nextQuestion);
+        restartButton.addEventListener('click', restartGame);
+
+        showQuestion();
+    </script>
+</body>
+</html>
